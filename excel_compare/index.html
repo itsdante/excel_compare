@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <script src="static/angular.1.4.6.js"></script>
+    <script src="static/main.css"></script>
+</head>
+<body>
+<div ng-app="myApp" ng-controller="myCtrl" class="smart-green">
+    <p>模板EXCEL : <input type="file" fileread filename="file1" ></p>
+    <p>需要对比的EXCEL : <input type="file" fileread filename="file2"></p>
+    <hr>
+    <p class="smart-green">模板EXCEL :{{file2}}</p>
+    <p>需要对比的EXCEL :{{file1}}</p>
+    <button ng-click="compareExcel()">对比</button>
+</div>
+<script>
+    var app = angular.module('myApp', []);
+
+    app.directive("fileread", [function () {
+        return {
+            scope: {
+                fileread: "=",
+                filename: "="
+            },
+            link: function (scope, element, attributes) {
+                element.bind("change", function (changeEvent) {
+                    var reader = new FileReader();
+                    var filename = changeEvent.target.files[0].name;
+                    reader.onload = function (loadEvent) {
+                        scope.$apply(function () {
+                            scope.fileread = loadEvent.target.result;
+                            scope.filename = filename
+                        });
+                    }
+                    reader.readAsDataURL(changeEvent.target.files[0]);
+                });
+            }
+        }
+    }]);
+    app.controller('myCtrl', function ($scope, $http) {
+        $scope.file1 = "";
+        $scope.file2 = "";
+        $scope.compareExcel = function () {
+            var config = {params: {file1: $scope.file1, file2: $scope.file2}};
+            $http.post('/compare_excel', {}, config).success(function (data) {
+                alert('Success !')
+            }).error(function (err) {
+                alert(err)
+            });
+        }
+    });
+</script>
+</body>
+</html>
