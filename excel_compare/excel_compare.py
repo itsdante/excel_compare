@@ -6,8 +6,8 @@ from openpyxl.styles.colors import BLUE, RED, GREEN, YELLOW
 from flask import Flask
 from flask import abort
 from flask import redirect
-from flask import Blueprint,render_template,send_file
-from flask import Flask,render_template,request
+from flask import Blueprint, render_template, send_file
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
@@ -42,10 +42,10 @@ def sign_red(file_name, keys):
     for key in keys:
         cell = ws.cell(key)
         cell.font = font
-    wb2.save(file_name)
+    wb2.save('tmp_file/compare_result.xlsx')
 
 
-def main(file_model,file_new):
+def main(file_model, file_new):
     difference_key = data_compare(file_model, file_new)
     sign_red(file_new, keys=difference_key)
 
@@ -55,12 +55,25 @@ def index():
     return send_file('index.html')
 
 
-@app.route('/compare_excel',methods=['POST'])
+@app.route('/compare_excel', methods=['POST'])
 def main_route():
-    file1 = request.args.get('file1')
-    file2 = request.args.get('file2')
-    main(file1,file2)
-    return True
+    import base64,json
+    # from cStringIO import StringIO
+    data = json.loads(request.data)
+    x=base64.b64decode(data['file1'][78:])
+    y=base64.b64decode(data['file2'][78:])
+    with open('tmp_file/model.xlsx','wb') as model_file:
+        model_file.write(x)
+    with open('tmp_file/to_compare.xlsx','wb') as new_file:
+        new_file.write(y)
+    # #Use StringIO is too slowly
+    # x1,y1 = StringIO(),StringIO()
+    # x1.write(x)
+    # x1.seek(0)
+    # y1.write(y)
+    # y1.seek(0)
+    main('tmp_file/model.xlsx', 'tmp_file/to_compare.xlsx')
+    return json.dumps(True)
 
 
 if __name__ == '__main__':

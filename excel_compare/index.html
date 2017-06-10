@@ -21,16 +21,16 @@
             <h1>EXCEL COMPARE</h1>
         </div>
         <form class="form-signin">
-            <label>模板EXCEL : <input  type="file" fileread filename="file1" style="padding-left: 60px;color: cornflowerblue"></label>
-            <label>需要对比的EXCEL : <input  type="file" fileread filename="file2" style="padding-left: 19px;color: cornflowerblue"></label>
+            <label>模板EXCEL : <input  type="file" fileread="file1" filename="filename1" style="padding-left: 60px;color: cornflowerblue"></label>
+            <label>需要对比的EXCEL : <input  type="file" fileread="file2" filename="filename2" style="padding-left: 19px;color: cornflowerblue"></label>
             <hr>
             <div style="clear: both">
                 <p style="float: left;">模板EXCEL :</p>
-                <p style="color: green">{{file1}}</p>
+                <p style="color: green">{{filename1}}</p>
             </div>
             <div style="clear: both">
                 <p style="float: left;">需要对比的EXCEL :</p>
-                <p style="color: green">{{file2}}</p>
+                <p style="color: green">{{filename2}}</p>
             </div>
             <div style="clear: both">
                 <button ng-click="compareExcel()" class="btn-success">对比</button>
@@ -65,9 +65,11 @@
     app.controller('myCtrl', function ($scope, $http) {
         $scope.file1 = "";
         $scope.file2 = "";
+        $scope.filename1 = "";
+        $scope.filename2 = "";
         $scope.compareExcel = function () {
-            var config = {params: {file1: $scope.file1, file2: $scope.file2}};
-            $http.post('/compare_excel', {}, config).success(function (data) {
+            var config = {params: {file1: $scope.filename1, file2: $scope.filename2}};
+            $http.post('/compare_excel', {file1: $scope.file1, file2: $scope.file2}, config).success(function (data) {
                 alert('Success !')
             }).error(function (err) {
                 alert(err)
